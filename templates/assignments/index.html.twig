@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{% include 'nav.html.twig' %}
+<h2>Назначения</h2>
+
+<a href="{{ path('assignments_create') }}">+ Создать назначение</a>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>ID</th>
+        <th>Начало</th>
+        <th>Конец</th>
+        <th>Водитель</th>
+        <th>Машина</th>
+        <th>Действия</th>
+    </tr>
+
+    {% for a in assignments %}
+        <tr>
+            <td>{{ a.id }}</td>
+            <td>{{ a.startDate }}</td>
+            <td>{{ a.endDate }}</td>
+            <td>{{ a.driver.name }}</td>
+            <td>{{ a.vehicle.model ?? a.vehicle.id }}</td>
+            <td>
+                <a href="{{ path('assignments_edit', {id: a.id}) }}">Редактировать</a>
+
+                <form action="{{ path('assignments_delete', {id: a.id}) }}" method="POST" style="display:inline;">
+                    <button onclick="return confirm('Удалить назначение?')" style="color:red;">Удалить</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}

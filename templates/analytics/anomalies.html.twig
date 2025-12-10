@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<h1>Аномалии расхода топлива</h1>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>ID</th>
+        <th>Дата</th>
+        <th>Км</th>
+        <th>Топливо</th>
+        <th>Эффективность (км/л)</th>
+    </tr>
+
+    {% for row in data %}
+        <tr>
+            <td>{{ row.id }}</td>
+            <td>{{ row.date }}</td>
+            <td>{{ row.kilometers }}</td>
+            <td>{{ row.fuel_used }}</td>
+            <td>{{ row.efficiency|number_format(2) }}</td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}

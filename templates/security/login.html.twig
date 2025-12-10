@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Вход{% endblock %}
+
+{% block body %}
+<div style="max-width: 400px; margin: 50px auto;">
+    <h2>Авторизация</h2>
+
+    {% if error %}
+        <div style="color: red;">
+            {{ error.messageKey|trans(error.messageData, 'security') }}
+        </div>
+    {% endif %}
+
+    <form action="{{ path('login') }}" method="post">
+        <label>Email:</label>
+        <input type="text" name="_username" value="{{ last_username }}" required>
+
+        <label>Пароль:</label>
+        <input type="password" name="_password" required>
+
+        <button type="submit">Войти</button>
+
+        {% if error %}
+            <div style="color:red">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+    </form>
+
+</div>
+{% endblock %}

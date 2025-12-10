@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h2>Создать водителя</h2>
+
+<form action="{{ path('drivers_create') }}" method="POST">
+    <label>Имя:</label><br>
+    <input type="text" name="name"><br><br>
+
+    <label>Категория лицензии:</label><br>
+    <input type="text" name="licenseCategory"><br><br>
+
+    <label>Контактные данные:</label><br>
+    <input type="text" name="contact"><br><br>
+
+    <button type="submit">Создать</button>
+</form>
+
+<a href="{{ path('drivers_list') }}">⬅ Назад</a>
+{% endblock %}

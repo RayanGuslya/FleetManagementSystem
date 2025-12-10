@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{% include 'nav.html.twig' %}
+
+<h1>Заправки</h1>
+
+<a href="{{ path('refuel_create') }}">➕ Добавить заправку</a>
+<br><br>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>ID</th>
+        <th>Дата</th>
+        <th>Литры</th>
+        <th>Сумма</th>
+        <th>Автомобиль</th>
+        <th>Действия</th>
+    </tr>
+
+    {% for r in records %}
+        <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.date }}</td>
+            <td>{{ r.liters }}</td>
+            <td>{{ r.amount }}</td>
+            <td>{{ r.vehicle ? r.vehicle.model : '—' }}</td>
+            <td>
+                <a href="{{ path('refuel_edit', {id: r.id}) }}">✏</a> |
+                <a href="{{ path('refuel_delete', {id: r.id}) }}" onclick="return confirm('Удалить?')">🗑</a>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}

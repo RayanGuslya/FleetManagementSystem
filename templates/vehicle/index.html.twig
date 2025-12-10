@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{% include 'nav.html.twig' %}
+<h2>Список автомобилей</h2>
+<a href="{{ path('vehicle_create') }}">Создать новый автомобиль</a>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>VIN</th>
+        <th>Номер</th>
+        <th>Модель</th>
+        <th>Статус</th>
+        <th>Пробег</th>
+        <th>Действия</th>
+    </tr>
+    {% for v in vehicles %}
+        <tr>
+            <td>{{ v.id }}</td>
+            <td>{{ v.VIN }}</td>
+            <td>{{ v.plateNumber }}</td>
+            <td>{{ v.model }}</td>
+            <td>{{ v.status }}</td>
+            <td>{{ v.mileage }}</td>
+            <td>
+                <a href="{{ path('vehicle_edit', {id: v.id}) }}">Редактировать</a>
+                <form action="{{ path('vehicle_delete', {id: v.id}) }}" method="POST" style="display:inline">
+                    <button type="submit">Удалить</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

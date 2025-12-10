@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h2>Создать назначение</h2>
+
+<form action="{{ path('assignments_create') }}" method="POST">
+
+    <label>Начало:</label><br>
+    <input type="text" name="startDate"><br><br>
+
+    <label>Конец:</label><br>
+    <input type="text" name="endDate"><br><br>
+
+    <label>Водитель:</label><br>
+    <select name="driver">
+        {% for d in drivers %}
+            <option value="{{ d.id }}">{{ d.name }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label>Машина:</label><br>
+    <select name="vehicle">
+        {% for v in vehicles %}
+            <option value="{{ v.id }}">{{ v.model ?? ('Vehicle #' ~ v.id) }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <button type="submit">Создать</button>
+</form>
+
+<a href="{{ path('assignments_list') }}">⬅ Назад</a>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<h1>Пробег по автомобилям</h1>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>ID авто</th>
+        <th>Пробег (км)</th>
+    </tr>
+
+    {% for row in data %}
+        <tr>
+            <td>{{ row.vehicle_id }}</td>
+            <td>{{ row.total_km }}</td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}

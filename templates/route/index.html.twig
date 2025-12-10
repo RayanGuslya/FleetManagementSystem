@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{% include 'nav.html.twig' %}
+<h1>Маршруты</h1>
+
+<a href="{{ path('route_create') }}">➕ Создать маршрут</a>
+<br><br>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>ID</th>
+        <th>Start Lat</th>
+        <th>Start Lng</th>
+        <th>End Lat</th>
+        <th>End Lng</th>
+        <th>Distance (м)</th>
+        <th>Действия</th>
+    </tr>
+
+    {% for route in routes %}
+    <tr>
+        <td>{{ route.id }}</td>
+        <td>{{ route.startLat }}</td>
+        <td>{{ route.startLng }}</td>
+        <td>{{ route.endLat }}</td>
+        <td>{{ route.endLng }}</td>
+        <td>{{ route.distance }}</td>
+        <td>
+            <a href="{{ path('route_edit', {'id': route.id}) }}">Редактировать</a> |
+            <a href="{{ path('route_delete', {'id': route.id}) }}">Удалить</a> |
+            <a href="{{ path('route_map', {'id': route.id}) }}">Показать маршрут</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

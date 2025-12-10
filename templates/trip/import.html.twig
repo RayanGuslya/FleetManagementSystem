@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+<h1>Импорт поездок CSV</h1>
+<form method="POST" enctype="multipart/form-data">
+    <input type="file" name="csv_file" accept=".csv" required>
+    <button type="submit">Загрузить</button>
+</form>
+<a href="{{ path('trip_index') }}">⬅ Назад</a>
+{% endblock %}

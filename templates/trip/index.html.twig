@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{% include 'nav.html.twig' %}
+<h1>Поездки</h1>
+
+<a href="{{ path('trip_create') }}">➕ Создать поездку</a>
+<br><br>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>ID</th>
+        <th>Дата</th>
+        <th>Км</th>
+        <th>Расход топлива</th>
+        <th>Автомобиль</th>
+        <th>Водитель</th>
+        <th>Действия</th>
+    </tr>
+
+    {% for t in trips %}
+        <tr>
+            <td>{{ t.id }}</td>
+            <td>{{ t.date }}</td>
+            <td>{{ t.kilometers }}</td>
+            <td>{{ t.fuelUsed }} л</td>
+            <td>{{ t.vehicle ? (t.vehicle.model ?: 'Vehicle #' ~ t.vehicle.id) : 'Нет автомобиля' }}</td>
+            <td>{{ t.driver ? (t.driver.name ?: 'Driver #' ~ t.driver.id) : 'Нет водителя' }}</td>
+            <td>
+                <a href="{{ path('trip_edit', {id: t.id}) }}">✏</a> |
+                <a href="{{ path('trip_delete', {id: t.id}) }}" onclick="return confirm('Удалить?')">🗑</a>
+            </td>
+        </tr>
+    {% endfor %}
+
+</table>
+{% endblock %}

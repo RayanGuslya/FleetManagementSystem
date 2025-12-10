@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{% include 'nav.html.twig' %}
+<h2>Список водителей</h2>
+
+<a href="{{ path('drivers_create') }}">+ Создать водителя</a>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>ID</th>
+        <th>Имя</th>
+        <th>Категория</th>
+        <th>Контакты</th>
+        <th>Действия</th>
+    </tr>
+
+    {% for d in drivers %}
+        <tr>
+            <td>{{ d.id }}</td>
+            <td>{{ d.name }}</td>
+            <td>{{ d.licenseCategory }}</td>
+            <td>{{ d.contact }}</td>
+            <td>
+                <a href="{{ path('drivers_edit', {id: d.id}) }}">Редактировать</a>
+
+                <form action="{{ path('drivers_delete', {id: d.id}) }}" method="POST" style="display:inline;">
+                    <button onclick="return confirm('Удалить водителя?')" style="color:red;">Удалить</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}

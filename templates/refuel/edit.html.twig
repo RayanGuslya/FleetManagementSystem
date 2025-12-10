@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{% include 'nav.html.twig' %}
+
+<h1>Редактировать заправку</h1>
+
+<form method="POST">
+
+    <label>Дата:</label><br>
+    <input type="date" name="date" value="{{ record.date }}" required><br><br>
+
+    <label>Литры:</label><br>
+    <input type="number" step="0.01" name="liters" value="{{ record.liters }}" required><br><br>
+
+    <label>Сумма:</label><br>
+    <input type="number" step="0.01" name="amount" value="{{ record.amount }}" required><br><br>
+
+    <label>Авто:</label><br>
+    <select name="vehicle" required>
+        {% for v in vehicles %}
+            <option value="{{ v.id }}" {{ record.vehicle and record.vehicle.id == v.id ? 'selected' : '' }}>
+                {{ v.model }} ({{ v.plateNumber }})
+            </option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <button type="submit">Сохранить</button>
+</form>
+
+<a href="{{ path('refuel_list') }}">⬅ Назад</a>
+
+{% endblock %}

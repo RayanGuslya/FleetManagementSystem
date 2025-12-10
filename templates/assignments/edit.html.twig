@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h2>Редактировать назначение</h2>
+
+<form action="{{ path('assignments_edit', {id: assignment.id}) }}" method="POST">
+
+    <label>Начало:</label><br>
+    <input type="text" name="startDate" value="{{ assignment.startDate }}"><br><br>
+
+    <label>Конец:</label><br>
+    <input type="text" name="endDate" value="{{ assignment.endDate }}"><br><br>
+
+    <label>Водитель:</label><br>
+    <select name="driver">
+        {% for d in drivers %}
+            <option value="{{ d.id }}" {% if d.id == assignment.driver.id %}selected{% endif %}>
+                {{ d.name }}
+            </option>
+        {% endfor %}
+    </select><br><br>
+
+    <label>Машина:</label><br>
+    <select name="vehicle">
+        {% for v in vehicles %}
+            <option value="{{ v.id }}" {% if v.id == assignment.vehicle.id %}selected{% endif %}>
+                {{ v.model ?? ('Vehicle #' ~ v.id) }}
+            </option>
+        {% endfor %}
+    </select><br><br>
+
+    <button type="submit">Сохранить</button>
+</form>
+
+<a href="{{ path('assignments_list') }}">⬅ Назад</a>
+{% endblock %}

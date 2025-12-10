@@ -1,0 +1,60 @@
+name: CI / Test / Deploy
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  tests:
+    name: Run PHPUnit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+          extensions: mbstring, intl, pdo_mysql
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit --testdox
+
+  deploy:
+    name: Deploy to Production Server
+    runs-on: ubuntu-latest
+    needs: tests
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via rsync over SSH
+        uses: Burnett01/rsync-deployments@5.2
+        with:
+          switches: -avzr --delete
+          path: "./"
+          remote_path: "/var/www/project"
+          remote_host: ${{ secrets.SERVER_HOST }}
+          remote_user: ${{ secrets.SERVER_USER }}
+          remote_key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Run composer install on server
+        uses: appleboy/ssh-action@v1.0.1
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd /var/www/project
+            composer install --no-dev --optimize-autoloader
+            php bin/console cache:clear --env=prod
+            php bin/console cache:warmup --env=prod

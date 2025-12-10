@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>Редактировать маршрут</h1>
+
+<form method="POST">
+
+    <h3>Начальная точка</h3>
+
+    <label>Широта (Lat):</label><br>
+    <input type="number" step="0.000001" name="startLat" value="{{ route.startLat }}" required><br><br>
+
+    <label>Долгота (Lng):</label><br>
+    <input type="number" step="0.000001" name="startLng" value="{{ route.startLng }}" required><br><br>
+
+    <h3>Конечная точка</h3>
+
+    <label>Широта (Lat):</label><br>
+    <input type="number" step="0.000001" name="endLat" value="{{ route.endLat }}" required><br><br>
+
+    <label>Долгота (Lng):</label><br>
+    <input type="number" step="0.000001" name="endLng" value="{{ route.endLng }}" required><br><br>
+
+    <label>Расстояние (м):</label><br>
+    <input type="number" name="distance" value="{{ route.distance }}"><br><br>
+
+    <button type="submit">Сохранить</button>
+</form>
+
+<br>
+<a href="{{ path('route_index') }}">⬅ Назад</a>
+
+{% endblock %}

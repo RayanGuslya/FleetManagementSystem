@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h2>{{ vehicle is defined ? 'Редактировать' : 'Создать' }} автомобиль</h2>
+
+<form method="POST">
+    <label>VIN:</label><br>
+    <input type="text" name="VIN" value="{{ vehicle.VIN ?? '' }}"><br><br>
+
+    <label>Номер:</label><br>
+    <input type="text" name="plateNumber" value="{{ vehicle.plateNumber ?? '' }}"><br><br>
+
+    <label>Модель:</label><br>
+    <input type="text" name="model" value="{{ vehicle.model ?? '' }}"><br><br>
+
+    <label>Статус:</label><br>
+    <input type="text" name="status" value="{{ vehicle.status ?? '' }}"><br><br>
+
+    <label>Пробег:</label><br>
+    <input type="number" name="mileage" value="{{ vehicle.mileage ?? '' }}"><br><br>
+
+    <button type="submit">Сохранить</button>
+</form>
+
+<a href="{{ path('vehicle_index') }}">⬅ Назад</a>
+{% endblock %}

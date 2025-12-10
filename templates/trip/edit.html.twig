@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>Редактировать поездку</h1>
+
+<form method="POST">
+
+    <label>Дата:</label><br>
+    <input type="text" name="date" value="{{ trip.date }}"><br><br>
+
+    <label>Километраж:</label><br>
+    <input type="number" name="kilometers" value="{{ trip.kilometers }}"><br><br>
+
+    <label>Расход топлива:</label><br>
+    <input type="number" step="0.01" name="fuelUsed" value="{{ trip.fuelUsed }}"><br><br>
+
+    <label>Автомобиль:</label><br>
+    <select name="vehicle">
+        {% for v in vehicles %}
+            <option value="{{ v.id }}" {% if v.id == trip.vehicle.id %}selected{% endif %}>
+                {{ v.model ?? 'Vehicle #' ~ v.id }}
+            </option>
+        {% endfor %}
+    </select><br><br>
+
+    <label>Водитель:</label><br>
+    <select name="driver">
+        {% for d in drivers %}
+            <option value="{{ d.id }}" {% if d.id == trip.driver.id %}selected{% endif %}>
+                {{ d.name ?? 'Driver #' ~ d.id }}
+            </option>
+        {% endfor %}
+    </select><br><br>
+
+    <button type="submit">Сохранить</button>
+</form>
+
+<br>
+<a href="{{ path('trip_index') }}">⬅ Назад</a>
+{% endblock %}

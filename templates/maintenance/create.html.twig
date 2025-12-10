@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h2>Добавить запись ТО</h2>
+
+<form action="{{ path('maintenance_create') }}" method="POST">
+
+    <label>Дата:</label><br>
+    <input type="text" name="date"><br><br>
+
+    <label>Тип работы:</label><br>
+    <input type="text" name="workType"><br><br>
+
+    <label>Стоимость:</label><br>
+    <input type="number" name="cost" step="0.01"><br><br>
+
+    <label>Автомобиль:</label><br>
+    <select name="vehicle">
+        {% for v in vehicles %}
+            <option value="{{ v.id }}">{{ v.model ?? ('Vehicle #' ~ v.id) }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <button type="submit">Создать</button>
+
+</form>
+
+<a href="{{ path('maintenance_list') }}">⬅ Назад</a>
+{% endblock %}
