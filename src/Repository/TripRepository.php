@@ -109,5 +109,4 @@ class TripRepository extends ServiceEntityRepository
         ";
         return $conn->fetchAllAssociative($sql);
     }
-
 }

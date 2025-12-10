@@ -3,8 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Trip;
-use App\Repository\VehicleRepository;
 use App\Repository\DriverRepository;
+use App\Repository\VehicleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class TripImportService
@@ -13,7 +13,8 @@ class TripImportService
         private EntityManagerInterface $em,
         private VehicleRepository $vehicleRepo,
         private DriverRepository $driverRepo
-    ) {}
+    ) {
+    }
 
     /**
      * @param resource $stream
@@ -51,11 +52,11 @@ class TripImportService
                 $data[$key] = $row[$i] ?? null;
             }
 
-            $dateStr     = trim($data['date'] ?? $data['дата'] ?? '');
-            $km          = (int) ($data['kilometers'] ?? $data['km'] ?? $data['километры'] ?? 0);
-            $fuel        = (float) str_replace(',', '.', $data['fuelused'] ?? $data['fuel'] ?? $data['топливо'] ?? 0);
-            $vehicleId   = (int) ($data['vehicleid'] ?? $data['vehicle'] ?? $data['автомобиль'] ?? 0);
-            $driverId    = (int) ($data['driverid'] ?? $data['driver'] ?? $data['водитель'] ?? 0);
+            $dateStr = trim($data['date'] ?? $data['дата'] ?? '');
+            $km = (int) ($data['kilometers'] ?? $data['km'] ?? $data['километры'] ?? 0);
+            $fuel = (float) str_replace(',', '.', $data['fuelused'] ?? $data['fuel'] ?? $data['топливо'] ?? 0);
+            $vehicleId = (int) ($data['vehicleid'] ?? $data['vehicle'] ?? $data['автомобиль'] ?? 0);
+            $driverId = (int) ($data['driverid'] ?? $data['driver'] ?? $data['водитель'] ?? 0);
 
             if (!$dateStr || $km <= 0) {
                 $errors[] = "Строка $line: неверные данные (дата или км)";
@@ -85,7 +86,7 @@ class TripImportService
             }
 
             $vehicle = $vehicleId ? $this->vehicleRepo->find($vehicleId) : null;
-            $driver  = $driverId  ? $this->driverRepo->find($driverId)   : null;
+            $driver = $driverId ? $this->driverRepo->find($driverId) : null;
 
             if ($vehicleId && !$vehicle) {
                 $errors[] = "Строка $line: автомобиль не найден (ID=$vehicleId)";
@@ -102,8 +103,12 @@ class TripImportService
             $trip->setDate($date->format('Y-m-d'));
             $trip->setKilometers($km);
             $trip->setFuelUsed($fuel);
-            if ($vehicle) $trip->setVehicle($vehicle);
-            if ($driver)  $trip->setDriver($driver);
+            if ($vehicle) {
+                $trip->setVehicle($vehicle);
+            }
+            if ($driver) {
+                $trip->setDriver($driver);
+            }
 
             $this->em->persist($trip);
             $imported++;
@@ -115,8 +120,8 @@ class TripImportService
 
         return [
             'imported' => $imported,
-            'skipped'  => $skipped,
-            'errors'   => $errors,
+            'skipped' => $skipped,
+            'errors' => $errors,
         ];
     }
 }

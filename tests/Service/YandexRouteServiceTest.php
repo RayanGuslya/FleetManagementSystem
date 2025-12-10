@@ -42,7 +42,7 @@ class YandexRouteServiceTest extends TestCase
 
     public function testCalculateDistanceReturnsNullOnInvalidResponse()
     {
-        $service = new class extends YandexRouteService {
+        $service = new class() extends YandexRouteService {
             public function __construct()
             {
                 parent::__construct('fake');

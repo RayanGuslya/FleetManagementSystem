@@ -3,10 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\MaintenanceRecord;
-use Psr\Log\LoggerInterface;
 use App\Repository\MaintenanceRecordRepository;
 use App\Repository\VehicleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -108,7 +108,7 @@ class MaintenanceRecordController extends AbstractController
                 'entityId' => $record->getId(),
                 'diff' => json_encode([
                     'before' => $oldDataArr,
-                    'after'  => $afterArr,
+                    'after' => $afterArr,
                 ]),
             ]);
 

@@ -1,28 +1,29 @@
 <?php
+
 namespace App\Controller;
 
 use App\Repository\TripRepository;
 use App\Repository\VehicleRepository;
 use App\Service\TripImportService;
 use Doctrine\ORM\EntityManagerInterface;
+use Dompdf\Dompdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Dompdf\Dompdf;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 class TripExportController extends AbstractController
 {
-    #[Route('/trips/import', name: 'trips_import', methods: ['GET','POST'])]
+    #[Route('/trips/import', name: 'trips_import', methods: ['GET', 'POST'])]
     public function import(Request $request, TripImportService $importService)
     {
         if ($request->isMethod('POST')) {
             $file = $request->files->get('csv_file');
             if (!$file) {
-                $this->addFlash('error','Не выбран CSV файл');
+                $this->addFlash('error', 'Не выбран CSV файл');
                 return $this->redirectToRoute('trip_index');
             }
 
@@ -32,7 +33,7 @@ class TripExportController extends AbstractController
 
             $this->addFlash('success', sprintf('Импортировано %d, Пропущено %d', $result['imported'], $result['skipped']));
             if (!empty($result['errors'])) {
-                $this->addFlash('warning', implode('; ', array_slice($result['errors'],0,5)));
+                $this->addFlash('warning', implode('; ', array_slice($result['errors'], 0, 5)));
             }
             return $this->redirectToRoute('trip_index');
         }
@@ -45,9 +46,9 @@ class TripExportController extends AbstractController
     {
         $trips = $tripRepo->findAll();
 
-        $response = new StreamedResponse(function() use ($trips) {
+        $response = new StreamedResponse(function () use ($trips) {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['id','date','kilometers','fuelUsed','vehicleId','driverId']);
+            fputcsv($handle, ['id', 'date', 'kilometers', 'fuelUsed', 'vehicleId', 'driverId']);
             foreach ($trips as $t) {
                 fputcsv($handle, [
                     $t->getId(),
@@ -61,8 +62,8 @@ class TripExportController extends AbstractController
             fclose($handle);
         });
 
-        $response->headers->set('Content-Type','text/csv; charset=utf-8');
-        $response->headers->set('Content-Disposition','attachment; filename="trips_'.date('Ymd_His').'.csv"');
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="trips_' . date('Ymd_His') . '.csv"');
 
         return $response;
     }
@@ -110,23 +111,23 @@ class TripExportController extends AbstractController
     {
         $rows = $tripRepo->getSummaryPerVehicle();
 
-        $response = new StreamedResponse(function() use ($rows) {
+        $response = new StreamedResponse(function () use ($rows) {
             $handle = fopen('php://output', 'w');
-            fputcsv($handle, ['vehicleId','model','total_km','total_fuel','avg_km_per_l']);
+            fputcsv($handle, ['vehicleId', 'model', 'total_km', 'total_fuel', 'avg_km_per_l']);
             foreach ($rows as $r) {
                 fputcsv($handle, [
                     $r['vehicle_id'],
                     $r['model'],
                     $r['total_km'],
                     $r['total_fuel'],
-                    round(($r['total_km'] / max(1, $r['total_fuel'])),2)
+                    round(($r['total_km'] / max(1, $r['total_fuel'])), 2)
                 ]);
             }
             fclose($handle);
         });
 
-        $response->headers->set('Content-Type','text/csv; charset=utf-8');
-        $response->headers->set('Content-Disposition','attachment; filename="report_summary_'.date('Ymd_His').'.csv"');
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="report_summary_' . date('Ymd_His') . '.csv"');
 
         return $response;
     }
@@ -142,14 +143,14 @@ class TripExportController extends AbstractController
         ]);
 
         $options = new \Dompdf\Options();
-        $options->set('defaultFont', 'DejaVu Sans');        
+        $options->set('defaultFont', 'DejaVu Sans');
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isRemoteEnabled', true);
         $options->set('isPhpEnabled', false);
     
         $dompdf = new Dompdf($options);
         $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'landscape'); 
+        $dompdf->setPaper('A4', 'landscape');
         $dompdf->render();
     
         $pdfContent = $dompdf->output();

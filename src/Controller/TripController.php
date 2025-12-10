@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Trip;
+use App\Repository\DriverRepository;
 use App\Repository\TripRepository;
 use App\Repository\VehicleRepository;
-use App\Repository\DriverRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

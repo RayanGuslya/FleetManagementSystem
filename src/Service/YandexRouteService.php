@@ -17,7 +17,6 @@ class YandexRouteService
         float $endLat,
         float $endLon
     ): ?int {
-
         $url = "https://api.routing.yandex.net/v2/route?apikey={$this->apiKey}"
              . "&waypoints={$startLat},{$startLon}|{$endLat},{$endLon}";
 

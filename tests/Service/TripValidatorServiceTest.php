@@ -2,8 +2,8 @@
 
 namespace tests\Service;
 
-use App\Service\TripValidatorService;
 use App\Repository\TripRepository;
+use App\Service\TripValidatorService;
 use PHPUnit\Framework\TestCase;
 
 class TripValidatorServiceTest extends TestCase

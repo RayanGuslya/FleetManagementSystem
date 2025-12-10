@@ -3,11 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Assignment;
-use Psr\Log\LoggerInterface;
 use App\Repository\AssignmentRepository;
 use App\Repository\DriverRepository;
 use App\Repository\VehicleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -60,13 +60,13 @@ class AssignmentController extends AbstractController
 
             $auditLogger->info('Assignment created', [
                 'username' => implode(',', (array)($this->getUser()?->getRoles())),
-                'action'   => 'create',
-                'entity'   => Assignment::class,
+                'action' => 'create',
+                'entity' => Assignment::class,
                 'entityId' => $assignment->getId(),
-                'diff'     => json_encode([
+                'diff' => json_encode([
                     'after' => $this->serializeAssignment($assignment)
                 ]),
-            ]);            
+            ]);
 
             return $this->redirectToRoute('assignments_list');
         }
@@ -108,16 +108,16 @@ class AssignmentController extends AbstractController
             $em->flush();
 
             $oldDataArr = $this->serializeAssignment($oldData);
-            $afterArr   = $this->serializeAssignment($assignment);
+            $afterArr = $this->serializeAssignment($assignment);
             
             $auditLogger->info('Assignment updated', [
                 'username' => implode(',', (array)($this->getUser()?->getRoles())),
-                'action'   => 'update',
-                'entity'   => Assignment::class,
+                'action' => 'update',
+                'entity' => Assignment::class,
                 'entityId' => $assignment->getId(),
-                'diff'     => json_encode([
+                'diff' => json_encode([
                     'before' => $oldDataArr,
-                    'after'  => $afterArr,
+                    'after' => $afterArr,
                 ]),
             ]);
             
@@ -145,10 +145,10 @@ class AssignmentController extends AbstractController
 
         $auditLogger->info('Assignment deleted', [
             'username' => implode(',', (array)($this->getUser()?->getRoles())),
-            'action'   => 'delete',
-            'entity'   => Assignment::class,
+            'action' => 'delete',
+            'entity' => Assignment::class,
             'entityId' => $assignment->getId(),
-            'diff'     => json_encode([
+            'diff' => json_encode([
                 'before' => $this->serializeAssignment($assignment)
             ]),
         ]);

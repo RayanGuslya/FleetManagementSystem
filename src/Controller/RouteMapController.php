@@ -25,8 +25,8 @@ class RouteMapController extends AbstractController
             'start_lat' => $route->getStartLat(),
             'start_lng' => $route->getStartLng(),
 
-            'end_lat'   => $route->getEndLat(),
-            'end_lng'   => $route->getEndLng(),
+            'end_lat' => $route->getEndLat(),
+            'end_lng' => $route->getEndLng(),
         ]);
     }
 }
