@@ -11,16 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Cache Composer packages
-        uses: actions/cache@v4
-        with:
-          path: vendor
-          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
-          restore-keys: composer-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
-        
       - name: Checkout code
         uses: actions/checkout@v4
 
