@@ -21,8 +21,7 @@ class VehicleRepository extends ServiceEntityRepository
      *     id: int,
      *     model: string,
      *     total_fuel: float,
-     *     total_cost: float
-     * }>
+     *     total_cost: float }>
      */
     public function getVehiclesFuelCostRating(): array
     {
