@@ -21,24 +21,20 @@ jobs:
           extensions: mbstring, intl, pdo_mysql
           coverage: none
 
-      - name: Create .env.test for CI
+      - name: Create .env.test
         run: |
           echo "APP_ENV=test" > .env.test
           echo "APP_DEBUG=0" >> .env.test
-          echo "APP_SECRET=ci_test_secret_$(date +%s)" >> .env.test
+          echo "APP_SECRET=test_secret" >> .env.test
 
       - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
+        run: composer install --no-interaction --prefer-dist
 
       - name: Run PHPUnit
-        run: vendor/bin/phpunit --testdox
-        env:
-          APP_ENV: test
+        run: vendor/bin/phpunit
 
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse --memory-limit=1G
-        env:
-          APP_ENV: test
 
       - name: Run ECS
         run: vendor/bin/ecs check
@@ -53,15 +49,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy via rsync over SSH
+      - name: Deploy via rsync
         uses: burnett01/rsync-deployments@5.2
         with:
-          switches: -avzr --delete --exclude=".git" --exclude=".env" --exclude="node_modules"
+          switches: -avzr --delete
           path: .
           remote_path: /var/www/project
           remote_host: ${{ secrets.SERVER_HOST }}
           remote_user: ${{ secrets.SERVER_USER }}
           remote_key: ${{ secrets.SERVER_SSH_KEY }}
+          remote_port: 22
 
       - name: Run post-deploy commands
         uses: appleboy/ssh-action@v1.0.1
@@ -69,10 +66,9 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
           script: |
             cd /var/www/project
             composer install --no-dev --optimize-autoloader --no-interaction
-            php bin/console cache:clear --env=prod --no-debug
+            php bin/console cache:clear --env=prod
             php bin/console cache:warmup --env=prod
-            # Если есть миграции:
-            # php bin/console doctrine:migrations:migrate --no-interaction --env=prod
