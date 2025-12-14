@@ -12,8 +12,6 @@ class YandexRouteService
     }
 
     /**
-     *
-     *
      * @param float $startLat Широта начальной точки
      * @param float $startLon Долгота начальной точки
      * @param float $endLat   Широта конечной точки
@@ -29,10 +27,10 @@ class YandexRouteService
         $waypoints = "{$startLon},{$startLat}|{$endLon},{$endLat}";
 
         $url = 'https://api.routing.yandex.net/v2/route'
-             . '?apikey=' . urlencode($this->apiKey)
-             . '&waypoints=' . urlencode($waypoints)
-             . '&mode=driving'
-             . '&results=1';
+            . '?apikey=' . urlencode($this->apiKey)
+            . '&waypoints=' . urlencode($waypoints)
+            . '&mode=driving'
+            . '&results=1';
 
         /**
          * @var array{

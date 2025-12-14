@@ -17,7 +17,7 @@ class VehicleRepository extends ServiceEntityRepository
     }
 
     /**
-     *
+     * Возвращает рейтинг автомобилей по затратам на топливо (при цене 60 руб/л)
      *
      * @return array<int, array{
      *     id: int,
