@@ -31,7 +31,7 @@ class YandexRouteService
         $url = 'https://api.routing.yandex.net/v2/route'
              . '?apikey=' . urlencode($this->apiKey)
              . '&waypoints=' . urlencode($waypoints)
-             . '&mode=driving' 
+             . '&mode=driving'
              . '&results=1';
 
         /**

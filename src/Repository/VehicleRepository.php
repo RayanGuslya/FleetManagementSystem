@@ -17,7 +17,7 @@ class VehicleRepository extends ServiceEntityRepository
     }
 
     /**
-     * 
+     *
      *
      * @return array<int, array{
      *     id: int,
