@@ -1,6 +1,6 @@
 <?php
 
-namespace tests\Service;
+namespace App\Tests\Service;
 
 use App\Repository\TripRepository;
 use App\Service\TripValidatorService;
@@ -8,10 +8,9 @@ use PHPUnit\Framework\TestCase;
 
 class TripValidatorServiceTest extends TestCase
 {
-    public function testDuplicateDetected()
+    public function testDuplicateDetected(): void
     {
         $repo = $this->createMock(TripRepository::class);
-
         $repo->method('findOneBy')->willReturn(new \stdClass());
 
         $service = new TripValidatorService($repo);
@@ -21,10 +20,9 @@ class TripValidatorServiceTest extends TestCase
         $this->assertTrue($result, 'Ожидалось, что дубль будет обнаружен');
     }
 
-    public function testNotDuplicate()
+    public function testNotDuplicate(): void
     {
         $repo = $this->createMock(TripRepository::class);
-
         $repo->method('findOneBy')->willReturn(null);
 
         $service = new TripValidatorService($repo);

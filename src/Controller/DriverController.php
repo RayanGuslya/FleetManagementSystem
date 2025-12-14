@@ -27,12 +27,19 @@ class DriverController extends AbstractController
     {
         if ($request->isMethod('POST')) {
             $driver = new Driver();
-            $driver->setName($request->request->get('name'));
-            $driver->setLicenseCategory($request->request->get('licenseCategory'));
-            $driver->setContact($request->request->get('contact'));
+
+            $name = $request->request->get('name');
+            $licenseCategory = $request->request->get('licenseCategory');
+            $contact = $request->request->get('contact');
+
+            $driver->setName(is_string($name) ? trim($name) : '');
+            $driver->setLicenseCategory(is_string($licenseCategory) ? trim($licenseCategory) : '');
+            $driver->setContact(is_string($contact) ? trim($contact) : '');
 
             $em->persist($driver);
             $em->flush();
+
+            $this->addFlash('success', 'Водитель успешно добавлен.');
 
             return $this->redirectToRoute('drivers_list');
         }
@@ -41,26 +48,36 @@ class DriverController extends AbstractController
     }
 
     #[Route('/drivers/edit/{id}', name: 'drivers_edit', methods: ['GET', 'POST'])]
-    public function edit(int $id, Request $request, DriverRepository $repo, EntityManagerInterface $em): Response
-    {
+    public function edit(
+        int $id,
+        Request $request,
+        DriverRepository $repo,
+        EntityManagerInterface $em
+    ): Response {
         $driver = $repo->find($id);
 
         if (!$driver) {
-            throw $this->createNotFoundException("Driver not found");
+            throw $this->createNotFoundException('Водитель не найден');
         }
 
         if ($request->isMethod('POST')) {
-            $driver->setName($request->request->get('name'));
-            $driver->setLicenseCategory($request->request->get('licenseCategory'));
-            $driver->setContact($request->request->get('contact'));
+            $name = $request->request->get('name');
+            $licenseCategory = $request->request->get('licenseCategory');
+            $contact = $request->request->get('contact');
+
+            $driver->setName(is_string($name) ? trim($name) : '');
+            $driver->setLicenseCategory(is_string($licenseCategory) ? trim($licenseCategory) : '');
+            $driver->setContact(is_string($contact) ? trim($contact) : '');
 
             $em->flush();
+
+            $this->addFlash('success', 'Данные водителя обновлены.');
 
             return $this->redirectToRoute('drivers_list');
         }
 
         return $this->render('drivers/edit.html.twig', [
-            'driver' => $driver
+            'driver' => $driver,
         ]);
     }
 
@@ -72,6 +89,9 @@ class DriverController extends AbstractController
         if ($driver) {
             $em->remove($driver);
             $em->flush();
+            $this->addFlash('success', 'Водитель удалён.');
+        } else {
+            $this->addFlash('warning', 'Водитель не найден.');
         }
 
         return $this->redirectToRoute('drivers_list');

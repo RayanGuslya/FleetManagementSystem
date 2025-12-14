@@ -28,11 +28,16 @@ class VehicleController extends AbstractController
         $vehicle = new Vehicle();
 
         if ($request->isMethod('POST')) {
-            $vehicle->setVIN($request->request->get('VIN'));
-            $vehicle->setPlateNumber($request->request->get('plateNumber'));
-            $vehicle->setModel($request->request->get('model'));
-            $vehicle->setStatus($request->request->get('status'));
-            $vehicle->setMileage((int) $request->request->get('mileage'));
+            $vin = $request->request->get('VIN');
+            $plateNumber = $request->request->get('plateNumber');
+            $model = $request->request->get('model');
+            $status = $request->request->get('status');
+            
+            $vehicle->setVIN(is_string($vin) ? trim($vin) : '');
+            $vehicle->setPlateNumber(is_string($plateNumber) ? trim($plateNumber) : '');
+            $vehicle->setModel(is_string($model) ? trim($model) : '');
+            $vehicle->setStatus(is_string($status) ? trim($status) : '');
+            
 
             $em->persist($vehicle);
             $em->flush();
@@ -47,11 +52,16 @@ class VehicleController extends AbstractController
     public function edit(Vehicle $vehicle, Request $request, EntityManagerInterface $em): Response
     {
         if ($request->isMethod('POST')) {
-            $vehicle->setVIN($request->request->get('VIN'));
-            $vehicle->setPlateNumber($request->request->get('plateNumber'));
-            $vehicle->setModel($request->request->get('model'));
-            $vehicle->setStatus($request->request->get('status'));
-            $vehicle->setMileage((int) $request->request->get('mileage'));
+            $vin = $request->request->get('vin');
+            $plateNumber = $request->request->get('plateNumber');
+            $model = $request->request->get('model');
+            $status = $request->request->get('status');
+            
+            $vehicle->setVIN(is_string($vin) ? trim($vin) : '');
+            $vehicle->setPlateNumber(is_string($plateNumber) ? trim($plateNumber) : '');
+            $vehicle->setModel(is_string($model) ? trim($model) : '');
+            $vehicle->setStatus(is_string($status) ? trim($status) : '');
+            
 
             $em->flush();
 

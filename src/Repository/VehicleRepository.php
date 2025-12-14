@@ -16,46 +16,32 @@ class VehicleRepository extends ServiceEntityRepository
         parent::__construct($registry, Vehicle::class);
     }
 
-    //    /**
-    //     * @return Vehicle[] Returns an array of Vehicle objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('v')
-    //            ->andWhere('v.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('v.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Vehicle
-    //    {
-    //        return $this->createQueryBuilder('v')
-    //            ->andWhere('v.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    /**
+     * 
+     *
+     * @return array<int, array{
+     *     id: int,
+     *     model: string,
+     *     total_fuel: float,
+     *     total_cost: float
+     * }>
+     */
     public function getVehiclesFuelCostRating(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-    
+
         $sql = "
-            SELECT 
+            SELECT
                 v.id,
                 v.model,
                 COALESCE(SUM(t.fuel_used), 0) AS total_fuel,
                 COALESCE(SUM(t.fuel_used * 60), 0) AS total_cost
             FROM vehicle v
             LEFT JOIN trip t ON v.id = t.vehicle_id
-            GROUP BY v.id
+            GROUP BY v.id, v.model
             ORDER BY total_cost DESC
         ";
-    
+
         return $conn->fetchAllAssociative($sql);
     }
 }

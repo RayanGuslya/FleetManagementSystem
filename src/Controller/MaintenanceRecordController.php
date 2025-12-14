@@ -21,15 +21,18 @@ class MaintenanceRecordController extends AbstractController
             'records' => $repo->findAll(),
         ]);
     }
-  
+
+    /**
+     * @return array<string, mixed>
+     */
     private function serializeMaintenance(MaintenanceRecord $m): array
     {
         return [
             'id' => $m->getId(),
-            'vehicle_id' => $m->getVehicle(),
+            'vehicle_id' => $m->getVehicle()?->getId(),
             'date' => $m->getDate(),
             'work_type' => $m->getWorkType(),
-            'cost' => $m->getCost()
+            'cost' => $m->getCost(),
         ];
     }
 
@@ -43,26 +46,30 @@ class MaintenanceRecordController extends AbstractController
         if ($request->isMethod('POST')) {
             $record = new MaintenanceRecord();
 
-            $record->setDate($request->request->get('date'));
-            $record->setWorkType($request->request->get('workType'));
-            $record->setCost($request->request->get('cost'));
+            $date = $request->request->get('date');
+            $workType = $request->request->get('workType');
+            $cost = $request->request->get('cost');
+            $vehicleId = $request->request->get('vehicle');
 
-            $vehicle = $vehicleRepo->find($request->request->get('vehicle'));
+            $record->setDate(is_string($date) ? trim($date) : '');
+            $record->setWorkType(is_string($workType) ? trim($workType) : '');
+            $record->setCost(is_numeric($cost) ? (float)$cost : 0.0);
+
+            $vehicle = $vehicleId ? $vehicleRepo->find($vehicleId) : null;
             $record->setVehicle($vehicle);
 
             $em->persist($record);
             $em->flush();
 
             $auditLogger->info('MaintenanceRecord created', [
-                'username' => implode(',', (array)($this->getUser()?->getRoles())),
+                'username' => $this->getUser()?->getUserIdentifier() ?? 'anonymous',
                 'action' => 'create',
                 'entity' => MaintenanceRecord::class,
                 'entityId' => $record->getId(),
-                'diff' => json_encode([
-                    'after' => $this->serializeMaintenance($record)
-                ])
+                'diff' => json_encode(['after' => $this->serializeMaintenance($record)]),
             ]);
 
+            $this->addFlash('success', 'Запись о ТО успешно добавлена.');
             return $this->redirectToRoute('maintenance_list');
         }
 
@@ -83,35 +90,38 @@ class MaintenanceRecordController extends AbstractController
         $record = $repo->find($id);
 
         if (!$record) {
-            throw $this->createNotFoundException("Запись ТО не найдена");
+            throw $this->createNotFoundException('Запись ТО не найдена');
         }
 
         $oldData = clone $record;
 
         if ($request->isMethod('POST')) {
-            $record->setDate($request->request->get('date'));
-            $record->setWorkType($request->request->get('workType'));
-            $record->setCost($request->request->get('cost'));
+            $date = $request->request->get('date');
+            $workType = $request->request->get('workType');
+            $cost = $request->request->get('cost');
+            $vehicleId = $request->request->get('vehicle');
 
-            $vehicle = $vehicleRepo->find($request->request->get('vehicle'));
+            $record->setDate(is_string($date) ? trim($date) : '');
+            $record->setWorkType(is_string($workType) ? trim($workType) : '');
+            $record->setCost(is_numeric($cost) ? (float)$cost : 0.0);
+
+            $vehicle = $vehicleId ? $vehicleRepo->find($vehicleId) : null;
             $record->setVehicle($vehicle);
 
             $em->flush();
-            
-            $oldDataArr = $this->serializeMaintenance($oldData);
-            $afterArr = $this->serializeMaintenance($record);
 
             $auditLogger->info('MaintenanceRecord updated', [
-                'username' => implode(',', (array)($this->getUser()?->getRoles())),
+                'username' => $this->getUser()?->getUserIdentifier() ?? 'anonymous',
                 'action' => 'update',
                 'entity' => MaintenanceRecord::class,
                 'entityId' => $record->getId(),
                 'diff' => json_encode([
-                    'before' => $oldDataArr,
-                    'after' => $afterArr,
+                    'before' => $this->serializeMaintenance($oldData),
+                    'after' => $this->serializeMaintenance($record),
                 ]),
             ]);
 
+            $this->addFlash('success', 'Запись о ТО обновлена.');
             return $this->redirectToRoute('maintenance_list');
         }
 
@@ -122,25 +132,33 @@ class MaintenanceRecordController extends AbstractController
     }
 
     #[Route('/maintenance/delete/{id}', name: 'maintenance_delete', methods: ['POST'])]
-    public function delete(int $id, MaintenanceRecordRepository $repo, EntityManagerInterface $em, LoggerInterface $auditLogger): Response
-    {
+    public function delete(
+        int $id,
+        MaintenanceRecordRepository $repo,
+        EntityManagerInterface $em,
+        LoggerInterface $auditLogger
+    ): Response {
         $record = $repo->find($id);
 
-        if ($record) {
-            $em->remove($record);
-            $em->flush();
+        if (!$record) {
+            $this->addFlash('warning', 'Запись о ТО не найдена.');
+            return $this->redirectToRoute('maintenance_list');
         }
 
+        $serialized = $this->serializeMaintenance($record);
+
+        $em->remove($record);
+        $em->flush();
+
         $auditLogger->info('MaintenanceRecord deleted', [
-            'username' => implode(',', (array)($this->getUser()?->getRoles())),
+            'username' => $this->getUser()?->getUserIdentifier() ?? 'anonymous',
             'action' => 'delete',
             'entity' => MaintenanceRecord::class,
-            'entityId' => $record->getId(),
-            'diff' => json_encode([
-                'after' => $this->serializeMaintenance($record)
-            ]),
+            'entityId' => $id,
+            'diff' => json_encode(['before' => $serialized]),
         ]);
 
+        $this->addFlash('success', 'Запись о ТО удалена.');
         return $this->redirectToRoute('maintenance_list');
     }
 }

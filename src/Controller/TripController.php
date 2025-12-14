@@ -18,8 +18,8 @@ class TripController extends AbstractController
     public function index(TripRepository $tripRepository): Response
     {
         $user = $this->getUser();
-    
-        if (in_array('ROLE_DRIVER', $user->getRoles())) {
+
+        if ($user !== null && in_array('ROLE_DRIVER', $user->getRoles(), true)) {
             $trips = $tripRepository->findBy(['driver' => $user]);
         } else {
             $trips = $tripRepository->findAll();
@@ -42,7 +42,8 @@ class TripController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $trip = new Trip();
-            $trip->setDate($request->request->get('date'));
+            $date = $request->request->get('date');
+            $trip->setDate(is_string($date) ? trim($date) : '');
             $trip->setKilometers((int)$request->request->get('kilometers'));
             $trip->setFuelUsed((float)$request->request->get('fuelUsed'));
 
@@ -82,7 +83,8 @@ class TripController extends AbstractController
         $drivers = $driverRepository->findAll();
 
         if ($request->isMethod('POST')) {
-            $trip->setDate($request->request->get('date'));
+            $date = $request->request->get('date');
+            $trip->setDate(is_string($date) ? trim($date) : '');
             $trip->setKilometers((int)$request->request->get('kilometers'));
             $trip->setFuelUsed((float)$request->request->get('fuelUsed'));
 

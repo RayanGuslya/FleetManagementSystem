@@ -16,39 +16,19 @@ class TripRepository extends ServiceEntityRepository
         parent::__construct($registry, Trip::class);
     }
 
-    //    /**
-    //     * @return Trip[] Returns an array of Trip objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Trip
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
     public function getVehicleMileage(int $vehicleId): float
     {
-        return (float)$this->createQueryBuilder('t')
+        return (float) $this->createQueryBuilder('t')
             ->select('SUM(t.kilometers)')
             ->where('t.vehicle = :vehicle')
             ->setParameter('vehicle', $vehicleId)
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /**
+     * @return array<int, array{trip: Trip, consumption: float}>
+     */
     public function findFuelAnomalies(int $vehicleId): array
     {
         $trips = $this->createQueryBuilder('t')
@@ -61,7 +41,7 @@ class TripRepository extends ServiceEntityRepository
             ->getResult();
 
         if (count($trips) < 5) {
-            return []; // недостаточно данных
+            return [];
         }
 
         $consumptions = [];
@@ -71,7 +51,6 @@ class TripRepository extends ServiceEntityRepository
 
         $mean = array_sum($consumptions) / count($consumptions);
 
-        // вычисляем стандартное отклонение
         $variance = 0;
         foreach ($consumptions as $value) {
             $variance += pow($value - $mean, 2);
@@ -80,7 +59,6 @@ class TripRepository extends ServiceEntityRepository
 
         $threshold = $mean + 2 * $stddev;
 
-        // выбираем аномалии
         $anomalies = [];
         foreach ($trips as $trip) {
             $c = ($trip->getFuelUsed() / $trip->getKilometers()) * 100;
@@ -95,18 +73,29 @@ class TripRepository extends ServiceEntityRepository
         return $anomalies;
     }
 
+    /**
+     * @return array<int, array{
+     *     vehicle_id: int,
+     *     model: string,
+     *     total_km: int|null,
+     *     total_fuel: float|null
+     * }>
+     */
     public function getSummaryPerVehicle(): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = "
-            SELECT v.id as vehicle_id, v.model,
-                   SUM(t.kilometers) AS total_km,
-                   SUM(t.fuel_used) AS total_fuel
+            SELECT 
+                v.id as vehicle_id, 
+                v.model,
+                SUM(t.kilometers) AS total_km,
+                SUM(t.fuel_used) AS total_fuel
             FROM trip t
             JOIN vehicle v ON v.id = t.vehicle_id
             GROUP BY v.id, v.model
             ORDER BY total_km DESC
         ";
+
         return $conn->fetchAllAssociative($sql);
     }
 }

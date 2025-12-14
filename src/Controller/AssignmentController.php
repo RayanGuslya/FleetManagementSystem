@@ -25,6 +25,9 @@ class AssignmentController extends AbstractController
         ]);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function serializeAssignment(Assignment $a): array
     {
         return [
@@ -35,7 +38,7 @@ class AssignmentController extends AbstractController
             'vehicle' => $a->getVehicle()?->getModel(),
         ];
     }
-    
+
     #[Route('/assignments/create', name: 'assignments_create', methods: ['GET', 'POST'])]
     public function create(
         Request $request,
@@ -46,11 +49,19 @@ class AssignmentController extends AbstractController
     ): Response {
         if ($request->isMethod('POST')) {
             $assignment = new Assignment();
-            $assignment->setStartDate($request->request->get('startDate'));
-            $assignment->setEndDate($request->request->get('endDate'));
 
-            $driver = $driverRepo->find($request->request->get('driver'));
-            $vehicle = $vehicleRepo->find($request->request->get('vehicle'));
+            $startDate = $request->request->get('startDate');
+            $endDate = $request->request->get('endDate');
+
+            // Защита: приводим к строке, если null — пустая строка
+            $assignment->setStartDate(is_string($startDate) ? $startDate : '');
+            $assignment->setEndDate(is_string($endDate) ? $endDate : '');
+
+            $driverId = $request->request->get('driver');
+            $vehicleId = $request->request->get('vehicle');
+
+            $driver = $driverId ? $driverRepo->find($driverId) : null;
+            $vehicle = $vehicleId ? $vehicleRepo->find($vehicleId) : null;
 
             $assignment->setDriver($driver);
             $assignment->setVehicle($vehicle);
@@ -59,7 +70,7 @@ class AssignmentController extends AbstractController
             $em->flush();
 
             $auditLogger->info('Assignment created', [
-                'username' => implode(',', (array)($this->getUser()?->getRoles())),
+                'username' => $this->getUser()?->getUserIdentifier() ?? 'anonymous',
                 'action' => 'create',
                 'entity' => Assignment::class,
                 'entityId' => $assignment->getId(),
@@ -90,41 +101,42 @@ class AssignmentController extends AbstractController
         $assignment = $assignmentRepo->find($id);
 
         if (!$assignment) {
-            throw $this->createNotFoundException("Assignment not found");
+            throw $this->createNotFoundException('Assignment not found');
         }
-        
+
         $oldData = clone $assignment;
 
         if ($request->isMethod('POST')) {
-            $assignment->setStartDate($request->request->get('startDate'));
-            $assignment->setEndDate($request->request->get('endDate'));
+            $startDate = $request->request->get('startDate');
+            $endDate = $request->request->get('endDate');
 
-            $driver = $driverRepo->find($request->request->get('driver'));
-            $vehicle = $vehicleRepo->find($request->request->get('vehicle'));
+            $assignment->setStartDate(is_string($startDate) ? $startDate : '');
+            $assignment->setEndDate(is_string($endDate) ? $endDate : '');
+
+            $driverId = $request->request->get('driver');
+            $vehicleId = $request->request->get('vehicle');
+
+            $driver = $driverId ? $driverRepo->find($driverId) : null;
+            $vehicle = $vehicleId ? $vehicleRepo->find($vehicleId) : null;
 
             $assignment->setDriver($driver);
             $assignment->setVehicle($vehicle);
 
             $em->flush();
 
-            $oldDataArr = $this->serializeAssignment($oldData);
-            $afterArr = $this->serializeAssignment($assignment);
-            
             $auditLogger->info('Assignment updated', [
-                'username' => implode(',', (array)($this->getUser()?->getRoles())),
+                'username' => $this->getUser()?->getUserIdentifier() ?? 'anonymous',
                 'action' => 'update',
                 'entity' => Assignment::class,
                 'entityId' => $assignment->getId(),
                 'diff' => json_encode([
-                    'before' => $oldDataArr,
-                    'after' => $afterArr,
+                    'before' => $this->serializeAssignment($oldData),
+                    'after' => $this->serializeAssignment($assignment),
                 ]),
             ]);
-            
 
             return $this->redirectToRoute('assignments_list');
         }
-        
 
         return $this->render('assignments/edit.html.twig', [
             'assignment' => $assignment,
@@ -134,22 +146,31 @@ class AssignmentController extends AbstractController
     }
 
     #[Route('/assignments/delete/{id}', name: 'assignments_delete', methods: ['POST'])]
-    public function delete(int $id, AssignmentRepository $repo, EntityManagerInterface $em, LoggerInterface $auditLogger): Response
-    {
+    public function delete(
+        int $id,
+        AssignmentRepository $repo,
+        EntityManagerInterface $em,
+        LoggerInterface $auditLogger
+    ): Response {
         $assignment = $repo->find($id);
 
-        if ($assignment) {
-            $em->remove($assignment);
-            $em->flush();
+        if (!$assignment) {
+            // Если не найден — просто редиректим, без ошибки
+            return $this->redirectToRoute('assignments_list');
         }
 
+        $serialized = $this->serializeAssignment($assignment);
+
+        $em->remove($assignment);
+        $em->flush();
+
         $auditLogger->info('Assignment deleted', [
-            'username' => implode(',', (array)($this->getUser()?->getRoles())),
+            'username' => $this->getUser()?->getUserIdentifier() ?? 'anonymous',
             'action' => 'delete',
             'entity' => Assignment::class,
-            'entityId' => $assignment->getId(),
+            'entityId' => $id,
             'diff' => json_encode([
-                'before' => $this->serializeAssignment($assignment)
+                'before' => $serialized
             ]),
         ]);
 

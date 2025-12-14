@@ -1,13 +1,13 @@
 <?php
 
-namespace tests\Service;
+namespace App\Tests\Service;
 
 use App\Service\YandexRouteService;
 use PHPUnit\Framework\TestCase;
 
 class YandexRouteServiceTest extends TestCase
 {
-    public function testCalculateDistanceReturnsCorrectValue()
+    public function testCalculateDistanceReturnsCorrectValue(): void
     {
         $fakeJson = json_encode([
             'routes' => [
@@ -18,18 +18,18 @@ class YandexRouteServiceTest extends TestCase
         $service = new class($fakeJson) extends YandexRouteService {
             private string $fakeResponse;
 
-            public function __construct($fakeResponse)
+            public function __construct(string $fakeResponse)
             {
                 parent::__construct('fake');
                 $this->fakeResponse = $fakeResponse;
             }
 
-            protected function fetch(string $url, array $opts): ?string
+            protected function fetch(string $url, array $opts): string
             {
                 return $this->fakeResponse;
             }
 
-            protected function getApiResponse(string $url, array $opts): ?string
+            protected function getApiResponse(string $url, array $opts): string
             {
                 return $this->fakeResponse;
             }
@@ -40,7 +40,7 @@ class YandexRouteServiceTest extends TestCase
         $this->assertEquals(12345, $result);
     }
 
-    public function testCalculateDistanceReturnsNullOnInvalidResponse()
+    public function testCalculateDistanceReturnsNullOnInvalidResponse(): void
     {
         $service = new class() extends YandexRouteService {
             public function __construct()

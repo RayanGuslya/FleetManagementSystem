@@ -95,7 +95,7 @@ class Driver
     {
         if (!$this->assignments->contains($assignment)) {
             $this->assignments->add($assignment);
-            $assignment->setDrivre($this);
+            $assignment->setDriver($this);
         }
 
         return $this;
@@ -104,9 +104,8 @@ class Driver
     public function removeAssignment(Assignment $assignment): static
     {
         if ($this->assignments->removeElement($assignment)) {
-            // set the owning side to null (unless already changed)
-            if ($assignment->getDrivre() === $this) {
-                $assignment->setDrivre(null);
+            if ($assignment->getDriver() === $this) {
+                $assignment->setDriver(null);
             }
         }
 
@@ -134,7 +133,6 @@ class Driver
     public function removeTrip(Trip $trip): static
     {
         if ($this->trips->removeElement($trip)) {
-            // set the owning side to null (unless already changed)
             if ($trip->getDriver() === $this) {
                 $trip->setDriver(null);
             }
