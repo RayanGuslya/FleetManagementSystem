@@ -18,17 +18,14 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
-          extensions: mbstring, intl, pdo_mysql, zip, gd
+          extensions: mbstring, intl, pdo_mysql
           coverage: none
-          tools: composer:v2
 
-      - name: Create .env.test
+      - name: Create .env.test for CI
         run: |
-          echo "APP_ENV=test" >> .env.test
+          echo "APP_ENV=test" > .env.test
           echo "APP_DEBUG=0" >> .env.test
-          echo "APP_SECRET=ci_secret_for_tests" >> .env.test
-          # Если есть DATABASE_URL — добавь его из secrets или заглушку
-          # echo "DATABASE_URL=mysql://user:pass@localhost/db" >> .env.test
+          echo "APP_SECRET=ci_test_secret_$(date +%s)" >> .env.test
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
@@ -43,7 +40,7 @@ jobs:
         env:
           APP_ENV: test
 
-      - name: Run ECS (code style check)
+      - name: Run ECS
         run: vendor/bin/ecs check
 
   deploy:
